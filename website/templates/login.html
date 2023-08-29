@@ -1,0 +1,38 @@
+{% extends "nav.html" %}
+{% load static %}
+
+{% block body %}
+
+<link rel="stylesheet" href="{% static 'login.css' %}">
+<main>
+       <div class="form_tiles">
+            <i class="fa-solid fa-recycle fa-3x"></i>
+        
+            <h3>Welcome</h3>
+            <p>Start managing your buiness better and faster</p>
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    {{message}}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            {% endif %}
+            <form method="POST" action="{% url 'login' %}">
+                {% csrf_token %}
+                <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Username" name="username" required>
+                </div>
+                <div class="mb-3">
+                <input type="password" class="form-control" placeholder="password" name="password" required>
+                </div>
+                <button type="submit" class="btn btn-secondary btn-block">Login</button>
+            </form>
+       </div>
+
+</main>
+
+
+{% endblock %}
+
+

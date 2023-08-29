@@ -1,0 +1,21 @@
+{% extends "nav.html" %}
+
+{% block body %}
+<div class="card m-4">
+    <div class="card-header">
+      Supplier Details
+    </div>
+    <div class="card-body">
+      
+        <p> <strong>SUPPLIER NAME</strong> {{supplier_detail.name}} </p>
+        <p> <strong>SUPPLIER CODE</strong> {{supplier_detail.code}} </p>
+        <p> <strong>ADDRESS</strong> {{supplier_detail.address}} </p>
+        <p> <strong>PHONE NUMBER</strong> {{supplier_detail.phone}} </p>
+        <p> <strong>EMAIL ADDRESS</strong> {{supplier_detail.email}} </p>
+
+      <a href="{% url 'supplier' %}" class="btn btn-primary"> Back</a>
+      <a href="{% url 'delete_supplier' supplier_detail.id %}" class="btn btn-danger">Delete</a>
+      <a href="{% url 'update_supplier' supplier_detail.id %}" class="btn btn-primary">Update</a>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block body %}
+  <div class="container">
+    <a href="{% url 'add_supplier' %}" class="btn btn-secondary">Add Record</a></td>
+    <table class="table table-striped table-hover table-bordered mt-4">
+        <thead class="table-dark">
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Code</th>
+            <th scope="col">Address</th>
+            <th scope="col">Phone</th>
+            <th scope="col">Email</th>
+        </tr>
+        </thead>
+        <tbody>
+        
+            {% for supplier in suppliers %}
+                <tr>
+                    <td> <a href="{% url 'supplier_detail' supplier.id %}">{{supplier.name}}</a></td>
+                            <td>{{supplier.code}}</td>
+                                <td>{{supplier.address}}</td>
+                                    <td>{{supplier.phone}}</td>
+                                        <td> {{supplier.email}}</td>
+                </tr>
+                
+            {% endfor %}
+        
+        </tbody> 
+    </table>
+  </div>
+
+{% endblock %}

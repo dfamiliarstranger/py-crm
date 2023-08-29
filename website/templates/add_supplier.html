@@ -1,0 +1,16 @@
+{% extends 'nav.html' %}
+{% block body %}
+
+    div class="container mt-4">
+        <h2>Add records </h2>
+
+        <form method="POST" action="{% url 'add_supplier' %}">
+            {% csrf_token %}
+            {{form.as_p}}
+            
+            <button type="submit" class="btn btn-secondary"> Add supplier </button>
+            <a href="{% url 'supplier' %}" class="btn btn-primary"> Back</a>
+        </form>
+    </div>
+
+{% endblock %}
