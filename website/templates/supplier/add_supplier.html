@@ -1,8 +1,8 @@
 {% extends 'nav.html' %}
 {% block body %}
 
-    div class="container mt-4">
-        <h2>Add records </h2>
+    <div class="container mt-4">
+        <h2>Add suppliers </h2>
 
         <form method="POST" action="{% url 'add_supplier' %}">
             {% csrf_token %}

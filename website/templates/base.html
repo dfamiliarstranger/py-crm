@@ -14,11 +14,11 @@
             <ul>
                 <li><a href="#">Dashboard</a></li>
                 <li><a href="#">Category</a></li>
-                <li><a href="#">Products</a></li>
+                <li><a href="{% url 'product' %}">Products</a></li>
                 <li><a href="{% url 'supplier'%}">Supplier</a></li>
-                <li><a href="#">Purchases</a></li>
+                <li><a href="{% url 'purchase'%}">Purchases</a></li>
                 <li><a href="#">Sales</a></li>
-                <li><a href="#">Inventory</a></li>
+                <li><a href="{%url 'inventory'%}">Inventory</a></li>
                 <li><a href="{% url 'login'%}">Logout</a></li>
             </ul>
         </div>
@@ -37,7 +37,26 @@
             </div> 
         </div>
     </div>
+
     
+    <script>
+      document
+        .getElementById("product_choice")
+        .addEventListener("change", function () {
+          var choice = this.value;
+    
+          var preformFields = document.getElementById("preform_fields");
+          var shrinkwrapperFields = document.getElementById("shrinkwrapper_fields");
+          var capFields = document.getElementById("cap_fields");
+    
+          if (preformFields && shrinkwrapperFields && capFields) {
+            preformFields.style.display = choice === "preform" ? "block" : "none";
+            shrinkwrapperFields.style.display =
+              choice === "shrinkwrapper" ? "block" : "none";
+            capFields.style.display = choice === "cap" ? "block" : "none";
+          }
+        });
+    </script>
     <script src="https://kit.fontawesome.com/968dbc4b5e.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
   </body>
