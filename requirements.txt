@@ -1,7 +1,7 @@
 asgiref==3.7.2
 Django==3.2
 gunicorn==21.2.0
-mysql-connector-python==8.1.0
+mysql-connector-python==7.0.23,<8.1.0
 mysqlclient==2.2.0
 packaging==23.2
 protobuf==4.21.12
