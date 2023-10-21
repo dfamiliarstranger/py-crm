@@ -188,3 +188,20 @@ class InventoryListView(ListView):
     model = Purchase
     template_name = 'inventory/index.html'
     context_object_name = 'inventory'
+
+
+# views.py
+
+
+def add_item(request):
+    if request.method == 'POST':
+        form = PurchaseForm(request.POST)
+        if form.is_valid():
+            # Save the form data
+            form.save()
+            return redirect('add_product')  # Redirect to a success page
+    else:
+        form = PurchaseForm()
+
+    context = {'form': form}
+    return render(request, 'purchases/add_item.html', context)
