@@ -3,7 +3,7 @@
     <!-- product_page.html -->
    
     <div class="container">
-        <form method="POST" action="{% url 'add_purchase' %}">
+        <form>
             {% csrf_token %}
             {{form.as_p}}
             

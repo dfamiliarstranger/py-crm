@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import InventoryListView
+# from .views import InventoryListView
 
 
 
@@ -21,10 +21,19 @@ urlpatterns = [
         path('update_product/<int:pk>', views.update_product, name="update_product"),
         path('delete_product/<int:pk>', views.delete_product, name="delete_product"), 
 
-        path('add_purchase', views.add_purchase, name="add_purchase"), 
-        path('add_item', views.add_item, name="add_item"), 
+        # path('add_purchase', views.add_purchase, name="add_purchase"), 
+        # path('add_item', views.add_item, name="add_item"), 
         path('purchase/', views.purchase, name="purchase"),
-        path('purchase/<int:pk>', views.purchase_detail, name="purchase_detail"),
+        # path('purchase/<int:pk>', views.purchase_detail, name="purchase_detail"),
+        # path('purchase/<int:pk>', views.purchase_detail, name="purchase_detail"),
+        # path('purchase/<int:product_id>/', views.purchase_product, name='purchase_product'),
+        # path('inventory/', InventoryListView.as_view(), name='inventory'),
 
-        path('inventory/', InventoryListView.as_view(), name='inventory'),
+        path('preform/', views.preform_form, name='preform'),
+        path('inventory/', views.inventory_view, name='inventory'),
+
+        path('sales/', views.sales_view, name='sales_form'),
+        path('sales_history/', views.sales_history, name='sales'),
+        
+
     ]

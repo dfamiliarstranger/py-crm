@@ -1,0 +1,106 @@
+<!-- index.html -->
+{% extends "base.html" %}
+
+{% block body %}
+  <section id="id">
+    <div class="container-lg">
+      <div class="text-center">
+        <h2>Kindly Fill The Form Below</h2>
+        <p class="lead">
+          Add purchase(s) of products in the form below...
+        </p>
+      </div>
+
+      <div class="row justify-content-center my-5">
+        <div class="col-lg-6">
+          <!-- Your existing form -->
+          <form method="post" action="{% url 'add_purchase' %}">
+            {% csrf_token %}
+            <div class="form-group">
+              <label for="product" class="form-label">Product</label>
+              <select name="product" class="form-select" id="productSelect">
+                {% for product in products %}
+                  <option value="{{ product.id }}">{{ product.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div id="preformSection" class="form-section" style="display: none;">
+              <!-- Form for Preform -->
+              <div class="form-group">
+                <label for="supplier" class="form-label">Supplier</label>
+                <select name="supplier" class="form-select" id="supplier">
+                  {% for supplier in suppliers %}
+                    <option value="{{ supplier.id }}">{{ supplier.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="date" class="form-label">Date</label>
+                <input type="text" class="form-control" id="date" value="{% now 'Y-m-d H:i:s' %}" readonly>
+              </div>
+
+              <!-- Add other fields specific to Preform here -->
+            </div>
+
+            <div id="capsSection" class="form-section" style="display: none;">
+              <!-- Form for Caps -->
+              <!-- Add fields specific to Caps here -->
+            </div>
+
+            <!-- Add more sections for other products -->
+
+            <div class="form-group">
+              <label for="quantity" class="form-label">Quantity</label>
+              <input type="number" name="quantity" class="form-control" id="quantity">
+            </div>
+
+            <div class="form-group">
+              <label for="price" class="form-label">Price</label>
+              <input type="number" name="price" class="form-control" id="price">
+            </div>
+
+            <div class="form-group">
+              <label for="total" class="form-label">Total</label>
+              <input type="text" class="form-control" id="total" readonly>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // Calculate total based on quantity and price
+    document.getElementById('quantity').addEventListener('input', updateTotal);
+    document.getElementById('price').addEventListener('input', updateTotal);
+    document.getElementById('productSelect').addEventListener('change', showProductSection);
+
+    function updateTotal() {
+      var quantity = parseFloat(document.getElementById('quantity').value);
+      var price = parseFloat(document.getElementById('price').value);
+      var total = isNaN(quantity) || isNaN(price) ? 0 : quantity * price;
+      document.getElementById('total').value = total.toFixed(2);
+    }
+
+    function showProductSection() {
+      var selectedProduct = document.getElementById('productSelect').value;
+      var preformSection = document.getElementById('preformSection');
+      var capsSection = document.getElementById('capsSection');
+
+      // Hide all sections by default
+      preformSection.style.display = 'none';
+      capsSection.style.display = 'none';
+
+      // Show the section based on the selected product
+      if (selectedProduct === 'Preform') {
+        preformSection.style.display = 'block';
+      } else if (selectedProduct === 'Caps') {
+        capsSection.style.display = 'block';
+      }
+    }
+  </script>
+{% endblock %}

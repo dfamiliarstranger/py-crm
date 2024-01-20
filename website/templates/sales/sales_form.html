@@ -1,0 +1,52 @@
+<!-- sales_form.html -->
+
+{% extends "root.html" %}
+
+{% block body %}
+  <h2>Sales Form</h2>
+  <form method="post" action="{% url 'sales_form' %}" id="salesForm">
+    {% csrf_token %}
+    
+    <!-- Other form fields... -->
+
+    <label for="product">Product:</label>
+    <select name="product" id="product" onchange="populateFields()">
+      {% for inventory_item in inventory_items %}
+        <option value="{{ inventory_item.product.id }}" data-size="{{ inventory_item.size }}" data-color="{{ inventory_item.color }}" data-product-type="{{ inventory_item.product_type }}">
+          {{ inventory_item.product.name }} - {{ inventory_item.size }} - {{ inventory_item.color }} - {{ inventory_item.product_type }}
+        </option>
+      {% endfor %}
+    </select>
+
+    <label for="color">Color:</label>
+    <input type="text" name="color" id="color">
+
+    <label for="product_type">Product Type:</label>
+    <input type="text" name="product_type" id="product_type">
+
+    <label for="quantity">Quantity:</label>
+    <input type="number" name="quantity" id="quantity">
+
+    <label for="size">Size:</label>
+    <input type="number" name="size" id="size">
+
+    <label for="price">Price:</label>
+    <input type="text" name="price" id="price">
+
+    <!-- Other form fields... -->
+    {{message}}
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+    function populateFields() {
+      var select = document.getElementById("product");
+      var selectedOption = select.options[select.selectedIndex];
+      
+      // Populate color, product_type, or other fields as needed
+      document.getElementById("color").value = selectedOption.dataset.color;
+      document.getElementById("product_type").value = selectedOption.dataset.productType;
+    }
+  </script>
+{% endblock %}

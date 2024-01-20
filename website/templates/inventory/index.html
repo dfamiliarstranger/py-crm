@@ -1,37 +1,14 @@
-{% extends 'base.html' %}
+{% extends "root.html" %}
 {% block body %}
     <div class="container">
         <h1>Inventory</h1>
-        <table  class="table table-striped table-hover table-bordered mt-4">
-            <thead class="table-dark">
-                <tr>
-                    <th>Product</th>
-                    <th>Product Type</th>
-                    <th>Color</th>
-                    <th>Price</th>
-                    <th>Quantity</th>
-                    <th>Unit</th>
-                    <th>Unit Price</th>
-                    <th>Date</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in inventory %}
-                    <tr>
-                        <td>{{ item.product }}</td>
-                        <td>{{ item.product_type }}</td>
-                        <td>{{ item.color }}</td>
-                        <td>{{ item.price }}</td>
-                        <td>{{ item.quantity }}</td>
-                        <td>{{ item.unit }}</td>
-                        <td>{{ item.unit_price }}</td>
-                        <td>{{ item.date }}</td>
-                        <td>{{ item.total }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+        <ul>
+        {% for item in inventory_items %}
+            <li>{{ item.purchase.product }} - Quantity: {{ item.quantity }}</li>
+        {% empty %}
+            <li>No inventory items available.</li>
+        {% endfor %}
+        </ul>
+
     </div>
 {% endblock %}

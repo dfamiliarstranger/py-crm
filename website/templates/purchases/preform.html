@@ -1,0 +1,112 @@
+<!-- To create an HTML template that corresponds to the view I provided in the previous response, you can modify your existing "index.html" template. Here's an updated "index.html" template:
+
+```html -->
+{% extends "root.html" %}
+
+{% block body %}
+  <section id="id">
+    <div class="container-lg">
+      <div class="text-center">
+        <h2>Kindly Fill The Form Below</h2>
+        <p class="lead">
+          Add purchase(s) of preform in the form below...
+        </p>
+      </div>
+
+      <div class="row justify-content-center my-5">
+        <div class="col-lg-6">
+          <form method="post" action="{% url 'preform' %}">
+            {% csrf_token %}
+
+            <div class="form-group">
+              <label for="product" class="form-label">Product</label>
+              <select name="product" class="form-select" id="product">
+                <option value="" selected>Select</option>  <!-- Default option -->
+                {% for product in products %}
+                  <option value="{{ product.id }}">{{ product.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="supplier" class="form-label">Supplier</label>
+              <select name="supplier" class="form-select" id="supplier">
+                <option value="" selected>Select</option>  <!-- Default option -->
+                {% for supplier in suppliers %}
+                  <option value="{{ supplier.id }}">{{ supplier.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="color" class="form-label">Color</label>
+              <select name="color" class="form-select" id="color">
+                <option value="" selected>Select</option>  <!-- Default option -->
+                <option value="red">Red</option>
+                <option value="green">Green</option>
+                <option value="blue">Blue</option>
+                <!-- Add more colors as needed -->
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="size" class="form-label">Size</label>
+              <select name="size" class="form-select" id="size">
+                <option value="0" selected>Select</option>  <!-- Default option -->
+                <option value="28">28</option>
+                <option value="30">30</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="product_type" class="form-label">product_type</label>
+              <select name="product_type" class="form-select" id="product_type">
+                <option value="" selected>Select</option>  <!-- Default option -->
+                <option value="virgin wrapper">virgin wrapper</option>
+                <option value="preprocessed wrapper">preprocessed wrapper</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="quantity" class="form-label">Quantity</label>
+              <input type="number" name="quantity" class="form-control" id="quantity">
+            </div>
+
+            <div class="form-group">
+              <label for="price" class="form-label">Price</label>
+              <input type="number" name="price" class="form-control" id="price">
+            </div>
+
+            <div class="form-group">
+              <label for="total" class="form-label">Total</label>
+              <input type="text" class="form-control" id="total" readonly>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <a href="{% url 'inventory' %}" class="btn btn-secondary">Inventory</a>
+            <a href="{% url 'purchase' %}" class="btn btn-secondary">purchase</a>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // Calculate total based on quantity and price
+    document.getElementById('quantity').addEventListener('input', updateTotal);
+    document.getElementById('price').addEventListener('input', updateTotal);
+
+    function updateTotal() {
+      var quantity = parseFloat(document.getElementById('quantity').value);
+      var price = parseFloat(document.getElementById('price').value);
+      var total = isNaN(quantity) || isNaN(price) ? 0 : quantity * price;
+
+      document.getElementById('total').value = total.toFixed(2);
+    }
+  </script>
+{% endblock %}
+```
+
+In this template, I've added a "Select" option with an empty value as the default option for each select field. This will ensure that the user must select a value from the list before submitting the form. The JavaScript code for calculating the total remains the same.
+
+Make sure to use this updated template with the view provided in the previous response, and it should work as expected.

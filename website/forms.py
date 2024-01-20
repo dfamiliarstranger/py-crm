@@ -29,6 +29,19 @@ class PurchaseForm(forms.ModelForm):
         model = Purchase
         fields = '__all__'
 
+    def clean_size(self):
+        size = self.cleaned_data['size']
+        if size is not None and size != '':
+            try:
+                size = float(size)
+                if size < 0:
+                    raise forms.ValidationError("Size must be a non-negative number.")
+            except ValueError:
+                raise forms.ValidationError("Size must be a valid number.")
+        else:
+            size = None  # Set to None if empty or not provided
+        return size
+
 
 
 

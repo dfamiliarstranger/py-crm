@@ -1,8 +1,7 @@
-{% extends "base.html" %}
+{% extends "root.html" %}
 {% block body %}
   <div class="container">
-    <a href="{% url 'add_purchase' %}" class="btn btn-secondary">Add Purchase</a></td>
-    <a href="{% url 'add_item' %}" class="btn btn-secondary">Add Item</a></td>
+    <a href="{% url 'preform' %}" class="btn btn-secondary">Add purchase</a></td>
     <table class="table table-striped table-hover table-bordered mt-4">
         <thead class="table-dark">
         <tr>
@@ -14,7 +13,9 @@
             <th scope="col">Price</th>
             <th scope="col">Quantity</th>
             <th scope="col">Unit</th>
+            <th scope="col">size</th>
             <th scope="col">Unit_price</th>
+            <th scope="col">Total</th>
         </tr>
         </thead>
         <tbody>
@@ -22,15 +23,17 @@
             {% for purchase in purchases %}
                 <tr>
                     <td> {{purchase.date}}</a></td>
-                        <!-- <td> <a href="{% url 'purchase_detail' purchase.id %}">{{purchase.date}}</a></td> -->
+                        
                             <td>{{purchase.supplier}}</td>
                                 <td>{{purchase.product}}</td>
-                                    <td>{{purchase.Product_type}}</td>
+                                    <td>{{purchase.product_type}}</td>
                                         <td> {{purchase.color}}</td>
                                             <td> {{purchase.price}}</td>
-                                                <td> {{purchase.Quantity}}</td>
+                                                <td> {{purchase.quantity}}</td>
                                                     <td> {{purchase.unit}}</td>
-                                                        <td> {{purchase.Unit_price}}</td>
+                                                        <td> {{purchase.size}}</td>
+                                                            <td> {{purchase.unit_price}}</td>
+                                                                <td> {{purchase.total}}</td>
                 </tr>
                 
             {% endfor %}

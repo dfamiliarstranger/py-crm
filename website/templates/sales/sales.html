@@ -1,0 +1,38 @@
+<!-- sales_history.html -->
+
+{% extends "root.html" %}
+
+{% block body %}
+ <div class="container">
+  <h2>Sales History</h2>
+
+  <table class="table table-striped table-hover table-bordered mt-4">
+
+    <thead class="table-dark">
+      <tr>
+        <th>Date</th>
+        <th>Product</th>
+        <th>Color</th>
+        <th>Product Type</th>
+        <th>Quantity</th>
+        <th>Price</th>
+        <!-- Add more columns as needed -->
+      </tr>
+    </thead>
+    <tbody>
+      {% for sale in sales %}
+        <tr>
+          <td>{{ sale.date }}</td>
+          <td>{{ sale.product.name }}</td>
+          <td>{{ sale.color }}</td>
+          <td>{{ sale.product_type }}</td>
+          <td>{{ sale.quantity }}</td>
+          <td>{{ sale.price }}</td>
+          <!-- Add more columns as needed -->
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <a href="{% url 'sales_form' %}" class="btn btn-secondary">SALES</a>
+ </div>
+{% endblock %}
