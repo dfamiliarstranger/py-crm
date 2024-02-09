@@ -14,6 +14,7 @@
         <th>Product</th>
         <th>Color</th>
         <th>Product Type</th>
+        <th>Size</th>
         <th>Quantity</th>
         <th>Price</th>
         <!-- Add more columns as needed -->
@@ -23,9 +24,10 @@
       {% for sale in sales %}
         <tr>
           <td>{{ sale.date }}</td>
-          <td>{{ sale.product.name }}</td>
-          <td>{{ sale.color }}</td>
-          <td>{{ sale.product_type }}</td>
+          <td>{{ sale.inventory_item.product.name }}</td>
+          <td>{{ sale.inventory_item.color }}</td>
+          <td>{{ sale.inventory_item.product_type }}</td>
+          <td>{{ sale.inventory_item.size }}</td>
           <td>{{ sale.quantity }}</td>
           <td>{{ sale.price }}</td>
           <!-- Add more columns as needed -->

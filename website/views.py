@@ -1,4 +1,4 @@
-from django.db import transaction
+
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
@@ -6,8 +6,9 @@ from django.http import HttpResponse
 from django.views.generic import ListView
 from django.shortcuts import render, get_object_or_404
 from .models import Product, Supplier, Purchase, InventoryItem, update_inventory, Sales
-from .forms import AddSupplierForm, ProductForm, PurchaseForm
-
+from .forms import AddSupplierForm, ProductForm
+from django import forms
+from django.core.exceptions import ValidationError
 # Create your views here.
 #Login Views
 def home(request):
@@ -162,44 +163,16 @@ def purchase(request):
         messages.success(request, ("You are not logged in!!"))
         return redirect('login')
     
-def add_purchase(request):
-    if request.user.is_authenticated:
-        if request.method == "POST":
-            form = PurchaseForm(request.POST)
-            if form.is_valid():
-                form.save()
-                messages.success(request, "Product successfully saved")
-                return redirect('purchase')
-        else:
-            form = PurchaseForm()
-
-        suppliers = Supplier.objects.all()
-        products = Product.objects.all()
-        selected_product = request.POST.get('product', '')  # Get the selected product from the form
-
-        return render(request, 'purchases/add_purchase.html', {
-            'form': form,
-            'suppliers': suppliers,
-            'products': products,
-            'selected_product': selected_product,
-        })
-    else:
-        messages.success(request, "You are not logged in!!")
-        return redirect('login')
-    
-
-def preform_form(request):
+def add_purchases(request):
     if request.method == 'POST':
-        # Get the data from the form
         product_id = request.POST.get('product', None)
         supplier_id = request.POST.get('supplier', None)
         color = request.POST.get('color', '')
         product_type = request.POST.get('product_type', '')
         quantity = request.POST.get('quantity')
-        size = request.POST.get('size', '')  # Default to empty string if not provided
+        size = request.POST.get('size', '')  
         price = request.POST.get('price')
         
-        # Validate product and supplier IDs
         if product_id is None or supplier_id is None:
             return HttpResponse("Product and Supplier are required fields.")
         
@@ -209,178 +182,94 @@ def preform_form(request):
         except (Product.DoesNotExist, Supplier.DoesNotExist):
             return HttpResponse("Invalid Product or Supplier selected.")
         
-        # Convert 'size' to a number if it's not an empty string
+        
         if size:
             size = float(size)
         
-        # Calculate the total
         total = float(quantity) * float(price)
         
-        # Create a Purchase object and save it to the database
+
         purchase = Purchase(
             product=product,
             supplier=supplier,
             color=color,
             product_type=product_type,
-            size=size,  # Will be an empty string if not provided
+            size=size,  
             price=price,
             quantity=quantity,
             total=total
         )
         purchase.save()
-        
-        return redirect('purchase')   # You can define a success_page URL in your urls.py
+        update_inventory(purchase)
+        return redirect('purchase') 
     else:
-        # Handle GET requests or other cases as needed
         products = Product.objects.all()
         suppliers = Supplier.objects.all()
         return render(request, 'purchases/preform.html', {'products': products, 'suppliers': suppliers})
 
+
+#SALES
+def sales(request):
+    sales = Sales.objects.all()
+    if request.user.is_authenticated:
+        return render(request, 'sales/sales.html', {'sales': sales})
+    else:
+        messages.success(request, ("You are not logged in!!"))
+        return redirect('login')
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import InventoryItem, Sales
+
+def record_sales(request):
+    if request.method == 'POST':
+        inventory_item_id = request.POST.get('inventory_item')
+        quantity = int(request.POST.get('quantity'))
+        price = float(request.POST.get('price'))
+
+        # Check if the inventory item exists and if there is enough inventory
+        try:
+            inventory_item = InventoryItem.objects.get(id=inventory_item_id)
+            if inventory_item.quantity < quantity:
+                raise ValueError("Insufficient inventory for this sale.")
+        except (InventoryItem.DoesNotExist, ValueError) as e:
+            messages.error(request, str(e))
+            return redirect('record_sales')
+
+        try:
+            # Deduct sold quantity from inventory
+            inventory_item.quantity -= quantity
+            inventory_item.save()
+
+            # Create a sales record
+            Sales.objects.create(
+                inventory_item=inventory_item,
+                quantity=quantity,
+                price=price
+            )
+
+            messages.success(request, "Sale recorded successfully!")
+            return redirect('sales')
+        
+        except Exception as e:
+            messages.error(request, f"Failed to record sale: {str(e)}")
+            return redirect('sales_form')
+    else:
+        # Fetch available inventory items for the dropdown
+        available_items = InventoryItem.objects.filter(quantity__gt=0)
+        return render(request, 'sales/sales_form.html', {'available_items': available_items})
+
     
-# def preform_form(request):
-#     if request.method == 'POST':
-#         # Get the data from the form
-#         product_id = request.POST.get('product', None)
-#         supplier_id = request.POST.get('supplier', None)
-#         color = request.POST.get('color', '')
-#         product_type = request.POST.get('product_type', '')
-#         quantity = request.POST.get('quantity')
-#         size = request.POST.get('size')
-#         price = request.POST.get('price')
-        
-#         # Validate product and supplier IDs
-#         if product_id is None or supplier_id is None:
-#             return HttpResponse("Product and Supplier are required fields.")
-        
-#         try:
-#             product = Product.objects.get(id=product_id)
-#             supplier = Supplier.objects.get(id=supplier_id)
-#         except (Product.DoesNotExist, Supplier.DoesNotExist):
-#             return HttpResponse("Invalid Product or Supplier selected.")
-        
-#         # Calculate the total
-#         total = float(quantity) * float(price)
-        
-#         # Create a Purchase object and save it to the database
-#         purchase = Purchase(
-#             product=product,
-#             supplier=supplier,
-#             color=color,
-#             product_type=product_type,
-#             size=size,
-#             price=price,
-#             quantity=quantity,
-#             total=total
-#         )
-#         purchase.save()
-        
-#         return redirect('purchase')  # You can define a success_page URL in your urls.py
-        
-#     # If it's a GET request, render the form
-#     products = Product.objects.all()
-#     suppliers = Supplier.objects.all()
-#     return render(request, 'purchases/preform.html', {'products': products, 'suppliers': suppliers})
 
 
+# Inventory view
 def inventory_view(request):
-    # Recalculate and update the inventory
-    update_inventory()
-    
-    # Retrieve the inventory items
+    if request.method == 'POST':
+        update_inventory()
     inventory_items = InventoryItem.objects.all()
-
-    # Pass the inventory items to the template context
     context = {'inventory_items': inventory_items}
 
     # Render the template with the context
     return render(request, 'inventory.html', context)
 
 
-
-# def sales_view(request):
-#     if request.method == 'POST':
-#         product_id = request.POST.get('product')
-#         color = request.POST.get('color')
-#         product_type = request.POST.get('product_type')
-#         quantity = int(request.POST.get('quantity'))
-#         price = float(request.POST.get('price'))
-
-#         try:
-#             inventory_item = InventoryItem.objects.get(
-#                 product_id=product_id,
-#                 color=color,
-#                 product_type=product_type,
-#             )
-#         except InventoryItem.DoesNotExist:
-#             return render(request, 'sales/sales_form.html', {'error': "Product not found in the inventory. Please check your input."})
-
-#         if inventory_item.quantity < quantity:
-#             return render(request, 'sales/sales_form.html', {'error': "Not enough quantity available in the inventory."})
-
-#         # Create a Sales object to record the sale
-#         sale = Sales(
-#             product=inventory_item.product,
-#             inventory_item=inventory_item,
-#             quantity=quantity,
-#             price=price,
-#         )
-#         sale.save()
-
-#         # Update the inventory after the sale
-#         inventory_item.quantity -= quantity
-#         inventory_item.save()
-
-#         messages.success(request, "Sale recorded successfully.")
-#         return redirect('sales')  # You can define a success page URL
-
-#     inventory_items = InventoryItem.objects.all()
-#     return render(request, 'sales/sales.html', {'inventory_items': inventory_items})
-
-@transaction.atomic
-def sales_view(request):
-    if request.method == 'POST':
-        product_id = request.POST.get('product')
-        color = request.POST.get('color')
-        product_type = request.POST.get('product_type')
-        quantity = int(request.POST.get('quantity'))
-        size_str = request.POST.get('size')
-        size = int(size_str) if size_str.isdigit() else 0
-        price = float(request.POST.get('price'))
-
-        try:
-            inventory_item = InventoryItem.objects.select_for_update().get(
-                product_id=product_id,
-                color=color,
-                product_type=product_type,
-                size = size
-            )
-        except InventoryItem.DoesNotExist:
-            return render(request, 'sales/sales_form.html', {'error': "Product not found in the inventory. Please check your input."})
-
-        if inventory_item.quantity < quantity:
-            return render(request, 'sales/sales_form.html', {'error': "Not enough quantity available in the inventory."})
-
-        # Create a Sales object to record the sale
-        sale = Sales(
-            product=inventory_item.product,
-            inventory_item=inventory_item,
-            quantity=quantity,
-            size=size,
-            price=price,
-        )
-        sale.save()
-
-        # Update the inventory after the sale
-        inventory_item.quantity -= quantity
-        inventory_item.save()
-
-        messages.success(request, "Sale recorded successfully.")
-        return redirect('sales')  # You can define a success page URL
-
-    inventory_items = InventoryItem.objects.all()
-    return render(request, 'sales/sales_form.html', {'inventory_items': inventory_items})
-
-
-def sales_history(request):
-    sales = Sales.objects.all()
-    return render(request, 'sales/sales.html', {'sales': sales})
