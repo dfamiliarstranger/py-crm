@@ -43,7 +43,10 @@ class PurchaseForm(forms.ModelForm):
         return size
 
 
-
+class TestProductForm(forms.ModelForm):
+    class Meta:
+        model = Purchase
+        fields = ['product', 'supplier', 'color', 'product_type', 'quantity', 'size', 'price', 'total']
 
 
 

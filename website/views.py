@@ -1,14 +1,17 @@
-
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.http import HttpResponse 
 from django.views.generic import ListView
 from django.shortcuts import render, get_object_or_404
+from django.template import loader
 from .models import Product, Supplier, Purchase, InventoryItem, update_inventory, Sales
-from .forms import AddSupplierForm, ProductForm
+from .forms import AddSupplierForm, ProductForm, TestProductForm
 from django import forms
 from django.core.exceptions import ValidationError
+from django.forms import formset_factory
+
+
 # Create your views here.
 #Login Views
 def home(request):
@@ -217,9 +220,7 @@ def sales(request):
         messages.success(request, ("You are not logged in!!"))
         return redirect('login')
 
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from .models import InventoryItem, Sales
+
 
 def record_sales(request):
     if request.method == 'POST':
@@ -227,21 +228,31 @@ def record_sales(request):
         quantity = int(request.POST.get('quantity'))
         price = float(request.POST.get('price'))
 
-        # Check if the inventory item exists and if there is enough inventory
-        try:
-            inventory_item = InventoryItem.objects.get(id=inventory_item_id)
-            if inventory_item.quantity < quantity:
-                raise ValueError("Insufficient inventory for this sale.")
-        except (InventoryItem.DoesNotExist, ValueError) as e:
-            messages.error(request, str(e))
-            return redirect('record_sales')
+        # Check if inventory_item_id is provided and valid
+        if not inventory_item_id:
+            messages.error(request, "select item from inventory is required.")
+            available_items = InventoryItem.objects.filter(quantity__gt=0)
+            return render(request, 'sales/sales_form.html', {'available_items': available_items})
 
         try:
-            # Deduct sold quantity from inventory
+            inventory_item = InventoryItem.objects.get(id=inventory_item_id)
+        except InventoryItem.DoesNotExist:
+            messages.error(request, "Invalid inventory item selected.")
+            available_items = InventoryItem.objects.filter(quantity__gt=0)
+            return render(request, 'sales/sales_form.html', {'available_items': available_items})
+
+        try:
+            if inventory_item.quantity < quantity:
+                raise ValidationError("Insufficient inventory for this sale.")
+        except ValidationError as e:
+            messages.error(request, str(e))
+            available_items = InventoryItem.objects.filter(quantity__gt=0)
+            return render(request, 'sales/sales_form.html', {'available_items': available_items})
+
+        try:
             inventory_item.quantity -= quantity
             inventory_item.save()
 
-            # Create a sales record
             Sales.objects.create(
                 inventory_item=inventory_item,
                 quantity=quantity,
@@ -254,8 +265,8 @@ def record_sales(request):
         except Exception as e:
             messages.error(request, f"Failed to record sale: {str(e)}")
             return redirect('sales_form')
+
     else:
-        # Fetch available inventory items for the dropdown
         available_items = InventoryItem.objects.filter(quantity__gt=0)
         return render(request, 'sales/sales_form.html', {'available_items': available_items})
 
@@ -272,4 +283,22 @@ def inventory_view(request):
     # Render the template with the context
     return render(request, 'inventory.html', context)
 
+def invoice(request):
+    inventory_items = InventoryItem.objects.all()
+    if request.user.is_authenticated:
+        return render(request, 'invoice/index.html',{'inventory_items': inventory_items})
+    else:
+        messages.success(request, ("error message"))
+        return redirect('sales')
+    
+def generate_invoice(request, sales_id):
+    try:
+        sale = Sales.objects.get(pk=sales_id)
+        inventory_items = InventoryItem.objects.all()
+        template = loader.get_template('invoice/index.html')
+        context = {'sales': sale , 'inventory_items': inventory_items}
+        invoice = template.render(context)
+        return HttpResponse(invoice)
+    except Sales.DoesNotExist:
+        return HttpResponse("Invoice not found", status=404)
 

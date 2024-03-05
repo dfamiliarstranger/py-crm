@@ -17,6 +17,7 @@
         <th>Size</th>
         <th>Quantity</th>
         <th>Price</th>
+        <th>Invoice</th>
         <!-- Add more columns as needed -->
       </tr>
     </thead>
@@ -29,12 +30,14 @@
           <td>{{ sale.inventory_item.product_type }}</td>
           <td>{{ sale.inventory_item.size }}</td>
           <td>{{ sale.quantity }}</td>
-          <td>{{ sale.price }}</td>
+          <td>{{ sale.price }} * {{sale.quantity }}</td>
+          <td> <a href="{% url 'generate_invoice' sale.id %}" class="btn btn-primary">Generate Invoice</a></td>
           <!-- Add more columns as needed -->
         </tr>
       {% endfor %}
     </tbody>
   </table>
   <a href="{% url 'sales_form' %}" class="btn btn-secondary">SALES</a>
+  
  </div>
 {% endblock %}

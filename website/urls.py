@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 
+
 urlpatterns = [ 
         path('', views.login_user, name="login"),
         path('home', views.home, name="home"),
@@ -21,9 +22,14 @@ urlpatterns = [
         path('purchase/', views.purchase, name="purchase"),
         path('add_purchase/', views.add_purchases, name="add_purchases"),
         
+        
+        
         path('inventory/', views.inventory_view, name='inventory'),
 
         path('sales/', views.sales, name='sales'),
         path('sales_form/', views.record_sales, name='sales_form'),
+
+        path('invoice/', views.invoice, name='invoice'),
+        path('sales/<int:sales_id>/invoice/', views.generate_invoice, name='generate_invoice'),
 
     ]

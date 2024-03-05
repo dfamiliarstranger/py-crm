@@ -54,7 +54,6 @@ class Purchase(models.Model):
     def __str__(self):
         return f"{self.product}"
 
-    
 def update_inventory(purchase):
     try:
         with transaction.atomic():
@@ -67,13 +66,9 @@ def update_inventory(purchase):
             ).first()
 
             if inventory_item:
-               InventoryItem.objects.filter(
-                    product=purchase.product,
-                    color=purchase.color,
-                    product_type=purchase.product_type,
-                    size=purchase.size
-                ).update(quantity=F('quantity') + purchase.quantity)
-                
+                # If the item exists, update its quantity
+                inventory_item.quantity = F('quantity') + purchase.quantity
+                inventory_item.save()
             else:
                 # If the item doesn't exist, create a new inventory item
                 InventoryItem.objects.create(
@@ -93,6 +88,7 @@ def update_inventory(purchase):
         # Handle exceptions, log errors, and return False to indicate failure
         print(f"Error updating inventory: {str(e)}")
         return False
+   
 
 class Sales(models.Model):
     inventory_item = models.ForeignKey(InventoryItem, on_delete=models.CASCADE)

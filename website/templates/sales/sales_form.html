@@ -3,10 +3,14 @@
 
 <div class="container">
   <h2>Record Sales</h2>
-  <div class="alert alert-warning alert-dismissible fade show" role="alert">
-    {{message}}
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-  </div>
+  {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        {{message}}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+  {% endif %}
   <form method="post">
     {% csrf_token %}
     <div class="form-group">
@@ -26,7 +30,7 @@
       <label for="price">Price:</label>
       <input type="number" class="form-control" id="price" name="price" step="0.01" required>
     </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <button type="submit" class="btn btn-primary mt-2">Submit</button>
   </form>
 </div>
 

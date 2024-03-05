@@ -1,0 +1,160 @@
+{% extends "root.html" %}
+
+{% block body %}
+<section id="id">
+  <div class="container-lg">
+    <div class="text-center">
+      <h2>Kindly Fill The Form Below</h2>
+      <p class="lead">
+        Add purchase(s) of preform in the form below...
+      </p>
+    </div>
+
+    <div class="row justify-content-center my-5">
+      <div class="col-lg-6">
+        <form method="post" action="{% url 'test' %}">
+          {% csrf_token %}
+
+          <!-- Supplier input -->
+          <div class="form-group">
+            <label for="supplier" class="form-label">Supplier</label>
+            <select name="supplier" class="form-select" id="supplier">
+              <option value="" selected>Select</option> <!-- Default option -->
+              {% for supplier in suppliers %}
+              <option value="{{ supplier.id }}">{{ supplier.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Dynamic product fields -->
+          <div id="products-container">
+            <!-- Product fields will be inserted here -->
+          </div>
+
+          <!-- Grand total -->
+          <div class="form-group">
+            <label for="grand-total" class="form-label">Grand Total</label>
+            <input type="text" class="form-control" id="grand-total" readonly>
+          </div>
+
+          <!-- Add product button -->
+          <button type="button" class="btn btn-primary" id="add-product-btn">Add Product</button>
+
+          <!-- Submit button -->
+          <button type="submit" class="btn btn-primary">Submit</button>
+          <a href="{% url 'inventory' %}" class="btn btn-secondary">Inventory</a>
+          <a href="{% url 'purchase' %}" class="btn btn-secondary">Purchase</a>
+          <a href="{% url 'test' %}" class="btn btn-secondary">Test</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  var productCount = 0; // Counter for tracking added products
+
+  // Function to add dynamic product fields
+  function addProductFields() {
+    productCount++;
+    var productsContainer = document.getElementById('products-container');
+
+    var productFields = `
+        <div class="product-fields" id="product-${productCount}">
+          <hr>
+          <h4>Product ${productCount}</h4>
+          <div class="form-group">
+            <label for="product-${productCount}-name" class="form-label">Product Name</label>
+            <select name="product_${productCount}" class="form-select" id="product-${productCount}-name">
+              <option value="" selected>Select</option>
+              {% for product in products %}
+              <option value="{{ product.id }}">{{ product.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="product-${productCount}-type" class="form-label">Product Type</label>
+            <select name="product_type_${productCount}" class="form-select" id="product-${productCount}-type">
+              <option value="" selected>Select</option>
+              <option value="Preprocessed">Preprocessed</option>
+              <option value="Virgin">Virgin</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="product-${productCount}-size" class="form-label">Size</label>
+            <input type="number" name="size_${productCount}" class="form-control" id="product-${productCount}-size">
+          </div>
+          <div class="form-group">
+            <label for="product-${productCount}-color" class="form-label">Color</label>
+            <select name="color_${productCount}" class="form-select" id="product-${productCount}-color">
+              <option value="" selected>Select</option>
+              <option value="Red">Red</option>
+              <option value="Green">Green</option>
+              <option value="Blue">Blue</option>
+              <!-- Add more color options as needed -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="product-${productCount}-quantity" class="form-label">Quantity</label>
+            <input type="number" name="quantity_${productCount}" class="form-control product-quantity" id="product-${productCount}-quantity">
+          </div>
+          <div class="form-group">
+            <label for="product-${productCount}-price" class="form-label">Price</label>
+            <input type="number" name="price_${productCount}" class="form-control product-price" id="product-${productCount}-price">
+          </div>
+          <div class="form-group">
+            <label for="product-${productCount}-total" class="form-label">Total</label>
+            <input type="text" class="form-control product-total" id="product-${productCount}-total" readonly>
+          </div>
+        </div>
+      `;
+
+    productsContainer.insertAdjacentHTML('beforeend', productFields);
+  }
+
+  // Event listener for add product button
+  document.getElementById('add-product-btn').addEventListener('click', function () {
+    addProductFields();
+  });
+
+  // Function to calculate total for each product
+  function calculateProductTotal(productNumber) {
+    var quantity = parseFloat(document.getElementById(`product-${productNumber}-quantity`).value);
+    var price = parseFloat(document.getElementById(`product-${productNumber}-price`).value);
+    var total = isNaN(quantity) || isNaN(price) ? 0 : quantity * price;
+
+    document.getElementById(`product-${productNumber}-total`).value = total.toFixed(2);
+
+    return total;
+  }
+
+  // Function to update grand total
+  function updateGrandTotal() {
+    var productTotals = document.getElementsByClassName('product-total');
+    var grandTotal = 0;
+
+    for (var i = 0; i < productTotals.length; i++) {
+      grandTotal += parseFloat(productTotals[i].value);
+    }
+
+    document.getElementById('grand-total').value = grandTotal.toFixed(2);
+  }
+
+  // Event listeners for product fields to calculate totals
+  document.addEventListener('input', function (event) {
+    if (event.target && event.target.classList.contains('product-quantity')) {
+      var productNumber = event.target.id.split('-')[1];
+      calculateProductTotal(productNumber);
+      updateGrandTotal();
+    }
+
+    if (event.target && event.target.classList.contains('product-price')) {
+      var productNumber = event.target.id.split('-')[1];
+      calculateProductTotal(productNumber);
+      updateGrandTotal();
+    }
+  });
+
+</script>
+
+{% endblock %}
